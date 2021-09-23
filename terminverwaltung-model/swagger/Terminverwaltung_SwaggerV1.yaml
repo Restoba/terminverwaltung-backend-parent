@@ -1,0 +1,213 @@
+swagger: "2.0"
+info:
+  description: "Schnittstelle des Terminverwaltungssystem für Impfterminen in Hausarztpraxen"
+  version: "1.0.0"
+  title: "Terminverwaltungssystem"
+  contact:
+    email: "maximiliangruber91@gmail.com"
+  license:
+    name: "Apache 2.0"
+    url: "https://www.apache.org/licenses/LICENSE-2.0.html"
+host: "localhost:8080"
+basePath: "/terminverwaltung/api/v1"
+schemes:
+  - "https"
+  - "http"
+paths:
+  /meeting:
+    post:
+      tags:
+        - "meeting"
+      summary: "Termin hinzufügen"
+      description: "Termin hinzufügen"
+      operationId: "addMeeting"
+      consumes:
+        - "application/json"
+      produces:
+        - "application/json"
+      parameters:
+        - in: "body"
+          name: "body"
+          description: "Meeting object that needs to be added"
+          required: true
+          schema:
+            $ref: "#/definitions/meeting"
+      responses:
+        "405":
+          description: "Invalid input"
+    get:
+      tags:
+        - "meeting"
+      summary: "Gibt alle Termine zurück"
+      operationId: "getAllMeetings"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "Termine ausgegeben"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/meeting"
+  /meeting/{meetingId}:
+    get:
+      tags:
+        - "meeting"
+      summary: "Suche Termin nach eindeutiger MeetingId"
+      description: "Liefert einen Beleg"
+      operationId: "getReceiptById"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "meetingId"
+          in: "path"
+          description: "Eindeutige MeetingId"
+          required: true
+          type: "string"
+      responses:
+        "200":
+          description: "Meeting gefunden"
+          schema:
+            $ref: "#/definitions/meeting"
+        "400":
+          description: "Invalide eindeutige MeetingId"
+        "404":
+          description: "Eindeutige MeetingId nicht gefunden"
+    delete:
+      tags:
+        - "meeting"
+      summary: "Löschen Termin nach eindeutiger MeetingId"
+      description: "Löschen Termin nach eindeutiger MeetingId"
+      operationId: "deleteMeetingById"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "meetingId"
+          in: "path"
+          description: "Eindeutige MeetingId"
+          required: true
+          type: "string"
+      responses:
+        "400":
+          description: "Invalide ID"
+          schema:
+            type: "array"
+            items:
+              $ref: '#/definitions/errors'
+        "404":
+          description: "Termin nicht gefunden"
+  /vaccinecapacity:
+    get:
+      tags:
+        - "vaccinecapacity"
+      summary: "Gibt alle Impfkapazitäten zurück"
+      operationId: "getAllVaccinecapacitys"
+      produces:
+        - "application/json"
+      responses:
+        "200":
+          description: "Impfkapazitäten ausgegeben"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/vaccinecapacity"
+  /vaccinecapacity/{vaccinecapacityId}:
+    put:
+      tags:
+        - "vaccinecapacity"
+      summary: "Update Impfkapazität nach eindeutiger BelegId"
+      description: "Änderung der Impfkapazität"
+      operationId: "putVaccinecapacityById"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "vaccinecapacityId"
+          in: "path"
+          description: "Eindeutige vaccinecapacityId"
+          required: true
+          type: "string"
+        - in: "body"
+          name: "body"
+          description: "Impfkapazität der geändert werden muss"
+          required: true
+          schema:
+            $ref: "#/definitions/vaccinecapacity"
+      responses:
+        "204":
+          description: "Impfkapazität geändert"
+        "400":
+          description: "Fehlerhafter Impfkapazität"
+          schema:
+            type: "array"
+            items:
+              $ref: '#/definitions/errors'
+        "404":
+          description: "Eindeutige vaccinecapacityId nicht gefunden"
+  /auth:
+    get:
+      tags:
+        - "authentication"
+      summary: "authentication"
+      description: "Berechtigungsprüfung"
+      operationId: "getAuthentication"
+      produces:
+        - "application/json"
+      parameters:
+        - name: "Username"
+          in: "query"
+          type: "string"
+          description: "Username"
+        - name: "Userpasswort"
+          in: "query"
+          type: "string"
+          description: "Userpasswort"
+        - name: "UserRolle"
+          in: "query"
+          type: "string"
+          description: "UserRolle"
+      responses:
+        "200":
+          description: "Autoriziert"
+        "401":
+          description: "Unautoriziert"
+definitions:
+  meeting:
+    type: "object"
+    properties:
+      meetingId:
+        type: "number"
+        format: "int"
+      meetingDateTime:
+        type: "string"
+        format: "date-time"
+      firstname:
+        type: "string"
+      lastname:
+        type: "string"
+      status:
+        type: "string"
+        description: "Meeting Status"
+        enum:
+          - "aktiv"
+          - "inaktiv"
+  vaccinecapacity:
+    type: "object"
+    properties:
+      vaccinecapacityId:
+        type: "number"
+        format: "int"
+      name:
+        type: "string"
+      capacity:
+        type: "number"
+        format: "int"
+  errors:
+    type: "object"
+    properties:
+      errorType:
+        type: "string"
+      message:
+        type: "string"
+      timestamp:
+        type: "string"
+        format: "date-time"
